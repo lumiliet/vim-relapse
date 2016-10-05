@@ -1,9 +1,9 @@
 
-let s:porNumber = 19191
+let s:portNumber = 19191
 
 fun! s:SendClojureCode(namespace, code)
     let command = json_encode({'namespace': a:namespace, 'code': a:code})
-    return system("echo '" . command . "' | nc localhost " . s:porNumber)
+    return system("echo '" . command . "' | nc localhost " . s:portNumber)
 endf
 
 fun! s:ReadRange() range
