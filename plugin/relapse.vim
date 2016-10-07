@@ -4,8 +4,12 @@ let s:relapsePort = 19191
 
 fun! s:SendClojureCode(namespace, code, nreplPort)
     let command = json_encode({'namespace': a:namespace, 'code': a:code, 'port': a:nreplPort})
-    let result = system("echo '" . command . "' | nc localhost " . s:relapsePort)
-    if len(result)
+    let completeCommand = "echo '" . command . "' | nc localhost " . s:relapsePort
+    let result = system(completeCommand)
+
+    if result == "java.net.ConnectException: Connection refused"
+        return s:SendClojureCode(a:namespace, a:code, s:ResetPortNumber())
+    elseif len(result)
         return result
     else
         return "No response"
@@ -38,6 +42,11 @@ fun! s:GetPortNumber()
         let b:nreplPort = s:ReadPortNumber()
     endif
 
+    return b:nreplPort
+endf
+
+fun! s:ResetPortNumber()
+    let b:nreplPort = s:ReadPortNumber()
     return b:nreplPort
 endf
 
