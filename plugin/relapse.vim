@@ -17,7 +17,7 @@ fun! s:SendClojureCode(namespace, code, nreplPort)
 endf
 
 fun! s:ReadRange() range
-    let code = join(getline(a:firstline, a:lastline))
+    let code = join(getline(a:firstline, a:lastline), "\n")
     let portNumber = s:GetPortNumber()
     if portNumber
         echo s:SendClojureCode(s:ReadNamespace(), code, portNumber)
