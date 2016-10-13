@@ -29,6 +29,7 @@ fun! s:GetCode(firstLine, lastLine)
     return join(getline(a:firstLine, a:lastLine), "\n")
 endf
 
+
 fun! s:ReadRange() range
     call s:CorrectCursorPosition()
     
@@ -87,18 +88,19 @@ fun! s:ReadPortNumber()
 endf
 
 
-
 fun! s:Backwards(pos)
     let code = getline(0, line('.') - 1) + [getline('.')[:a:pos - 1]]
 
     return s:TraverseCode(code, -1)
 endf
 
+
 fun! s:Forwards(pos)
     let code = [getline('.')[a:pos:]] + getline(line('.') + 1, '$')
 
     return s:TraverseCode(code, 1)
 endf
+
 
 fun! s:TraverseCode(code, increment)
 
@@ -134,6 +136,7 @@ fun! s:TraverseCode(code, increment)
     endif
 endf
 
+
 fun! s:Walk(pos)
     if a:pos < 1
         return ""
@@ -141,6 +144,7 @@ fun! s:Walk(pos)
         return s:Backwards(a:pos) . s:Forwards(a:pos)
     endif
 endf
+
 
 fun! s:FindParentForm()
     let pos = getpos('.')[2]
