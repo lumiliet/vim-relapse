@@ -34,6 +34,7 @@ fun! s:ReadRange() range
     call s:CorrectCursorPosition()
     
     let code = s:GetCode(a:firstline, a:lastline)
+    echo code
 
     let portNumber = s:GetPortNumber()
     if portNumber
@@ -147,8 +148,19 @@ endf
 
 
 fun! s:FindParentForm()
-    let pos = getpos('.')[2]
-    let res = Walk(pos)
+    return s:FindFirstForm([getpos('.')[2], match(getline('.'), "(") + 1])
+endf
 
-    return len(res) ? res : Walk(pos -1)
+fun! s:FindFirstForm(positions)
+    if len(a:positions) == 0
+        return ""
+    endif
+
+    let firstPass = s:Walk(a:positions[0])
+    if len(firstPass)
+        return firstPass
+    else
+        return s:FindFirstForm(a:positions[1:])
+    endif
+
 endf
