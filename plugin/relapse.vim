@@ -76,37 +76,27 @@ fun! Backwards()
     let pos = getpos('.')[2] - 1
     let code = getline(0, line('.') - 1) + [getline('.')[:pos]]
 
-    echo TraverseCode(code, -1)
+    return s:TraverseCode(code, -1)
 endf
 
-fun! Forward()
+fun! Forwards()
     let pos = getpos('.')[2]
     let code = [getline('.')[pos:]] + getline(line('.') + 1, '$')
 
-    echo code
-    echo Reverse(code)
-
-    " echo TraverseCode(code, 1)
+    return s:TraverseCode(code, 1)
 endf
 
-fun! Reverse(code)
-    let reversed = reverse(copy(a:code))
-    for index in range(0, len(reversed) -1)
-        let reversed[index] = reverse(split(reversed[index], '\zs'))
-    endfor
-    return reversed
-endf
+fun! s:TraverseCode(code, increment)
 
-fun! TraverseCode(code, increment)
+    let code = split(join(a:code, '\n'), '\zs')
 
-    let code = split(a:code, '\zs')
-
-    if a:increment == -1
-        let code = reverse(code, '\zs')
+    if a:increment < 0
+        let code = reverse(code)
     endif
 
     let parenCount = 0
     let maxCount = 0
+    let position = 0
     for index in range(0, len(code) -1)
         let char = code[index]
         if char == ')'
@@ -117,7 +107,19 @@ fun! TraverseCode(code, increment)
 
         if parenCount > maxCount
             let maxCount = parenCount
+            let position = index
         endif
     endfor
-    return maxCount
+
+    if maxCount == 0
+        return ""
+    elseif a:increment < 0
+        return join(reverse(code[:position]), '')
+    else
+        return join(code[:position], '')
+    endif
+endf
+
+fun! FindParentForm()
+    return Backwards() . Forwards()
 endf
