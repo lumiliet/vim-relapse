@@ -34,6 +34,7 @@ fun! s:ReadRange() range
     call s:CorrectCursorPosition()
     
     let code = s:GetCode(a:firstline, a:lastline)
+    echo code
 
     let portNumber = s:GetPortNumber()
     if portNumber
@@ -104,7 +105,7 @@ endf
 
 fun! s:TraverseCode(code, increment)
 
-    let code = split(join(a:code, '\n'), '\zs')
+    let code = split(join(a:code, "\n"), '\zs')
 
     if a:increment < 0
         let code = reverse(code)
