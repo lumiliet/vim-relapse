@@ -148,7 +148,12 @@ endf
 
 
 fun! s:FindParentForm()
-    return s:FindFirstForm([getpos('.')[2], match(getline('.'), "(") + 1])
+    let pos = getpos('.')[2]
+    return s:FindFirstForm([pos, s:GetPosOf('(') + 1, s:GetPosOf(')')])
+endf
+
+fun! s:GetPosOf(char)
+    return match(getline('.'), a:char)
 endf
 
 fun! s:FindFirstForm(positions)
