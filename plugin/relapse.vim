@@ -18,9 +18,9 @@ fun! s:SendClojureCode(namespace, code, nreplPort)
 endf
 
 
-fun! GetCode(firstLine, lastLine)
+fun! s:GetCode(firstLine, lastLine)
     if a:firstLine == a:lastLine
-        let form = FindParentForm()
+        let form = s:FindParentForm()
         if len(form)
             return form
         endif
@@ -32,7 +32,7 @@ endf
 fun! s:ReadRange() range
     call s:CorrectCursorPosition()
     
-    let code = GetCode(a:firstline, a:lastline)
+    let code = s:GetCode(a:firstline, a:lastline)
 
     let portNumber = s:GetPortNumber()
     if portNumber
@@ -142,7 +142,7 @@ fun! s:Walk(pos)
     endif
 endf
 
-fun! FindParentForm()
+fun! s:FindParentForm()
     let pos = getpos('.')[2]
     let res = Walk(pos)
 
