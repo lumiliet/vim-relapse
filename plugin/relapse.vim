@@ -1,5 +1,6 @@
 
 let s:relapsePort = 19191
+command! -range Relapse <line1>,<line2>call s:ReadRange()
 
 
 fun! s:SendClojureCode(namespace, code, nreplPort)
@@ -16,12 +17,23 @@ fun! s:SendClojureCode(namespace, code, nreplPort)
     endif
 endf
 
-fun! Escape(json)
-    return substitute(a:json, "'", "\\\\'", '')
+
+fun! GetCode(firstLine, lastLine)
+    if a:firstLine == a:lastLine
+        let form = FindParentForm()
+        if len(form)
+            return form
+        endif
+    endif
+
+    return join(getline(a:firstLine, a:lastLine), "\n")
 endf
 
 fun! s:ReadRange() range
-    let code = join(getline(a:firstline, a:lastline), "\n")
+    call s:CorrectCursorPosition()
+    
+    let code = GetCode(a:firstline, a:lastline)
+
     let portNumber = s:GetPortNumber()
     if portNumber
         echo s:SendClojureCode(s:ReadNamespace(), code, portNumber)
@@ -29,13 +41,14 @@ fun! s:ReadRange() range
         echo "No running repl for project"
     endif
 
-    call s:CorrectCursorPosition()
 endf
+
 
 fun! s:CorrectCursorPosition()
     let pos = getcurpos()
     call cursor(pos[1], pos[4])
 endf
+
 
 fun! s:ReadNamespace()
     for lineNumber in range(0, line('$'))
@@ -48,6 +61,7 @@ fun! s:ReadNamespace()
     return 'user'
 endf
 
+
 fun! s:GetPortNumber()
     if !exists('b:nreplPort')
         let b:nreplPort = s:ReadPortNumber()
@@ -56,10 +70,12 @@ fun! s:GetPortNumber()
     return b:nreplPort
 endf
 
+
 fun! s:ResetPortNumber()
     let b:nreplPort = s:ReadPortNumber()
     return b:nreplPort
 endf
+
 
 fun! s:ReadPortNumber()
     let nreplFilename = findfile('.nrepl-port', expand('%:p') . ';~/')
@@ -70,18 +86,16 @@ fun! s:ReadPortNumber()
     endif
 endf
 
-command! -range Relapse <line1>,<line2>call s:ReadRange()
 
-fun! Backwards()
-    let pos = getpos('.')[2] - 1
-    let code = getline(0, line('.') - 1) + [getline('.')[:pos]]
+
+fun! s:Backwards(pos)
+    let code = getline(0, line('.') - 1) + [getline('.')[:a:pos - 1]]
 
     return s:TraverseCode(code, -1)
 endf
 
-fun! Forwards()
-    let pos = getpos('.')[2]
-    let code = [getline('.')[pos:]] + getline(line('.') + 1, '$')
+fun! s:Forwards(pos)
+    let code = [getline('.')[a:pos:]] + getline(line('.') + 1, '$')
 
     return s:TraverseCode(code, 1)
 endf
@@ -120,6 +134,17 @@ fun! s:TraverseCode(code, increment)
     endif
 endf
 
+fun! s:Walk(pos)
+    if a:pos < 1
+        return ""
+    else
+        return s:Backwards(a:pos) . s:Forwards(a:pos)
+    endif
+endf
+
 fun! FindParentForm()
-    return Backwards() . Forwards()
+    let pos = getpos('.')[2]
+    let res = Walk(pos)
+
+    return len(res) ? res : Walk(pos -1)
 endf
