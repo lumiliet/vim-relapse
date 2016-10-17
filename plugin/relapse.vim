@@ -34,7 +34,6 @@ fun! s:ReadRange() range
     call s:CorrectCursorPosition()
     
     let code = s:GetCode(a:firstline, a:lastline)
-    echo code
 
     let portNumber = s:GetPortNumber()
     if portNumber
