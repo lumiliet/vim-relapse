@@ -8,7 +8,7 @@ fun! s:SendClojureCode(namespace, code, nreplPort)
     let command = "echo " . shellescape(json) . " | nc localhost " . s:relapsePort . "\n"
     let result = system(command)
 
-    if result == "java.net.ConnectException: Connection refused"
+    if result =~ "java.net.ConnectException"
         return s:SendClojureCode(a:namespace, a:code, s:ResetPortNumber())
     elseif len(result)
         return result
