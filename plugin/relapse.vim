@@ -8,7 +8,13 @@ fun! s:SendClojureCode(namespace, code, nreplPort)
     let command = "echo " . shellescape(json) . " | nc localhost " . s:relapsePort . "\n"
     let result = system(command)
 
-    if result =~ "java.net.ConnectException"
+    if result =~ "java.net.ConnectException" || result =~ "port out of range"
+        if b:nreplPort != s:ResetPortNumber()
+            return s:SendClojureCode(a:namespace, a:code, s:ResetPortNumber())
+        else
+            return "No running repl for project"
+        endif
+    elseif  result =~ "SocketException"
         return s:SendClojureCode(a:namespace, a:code, s:ResetPortNumber())
     elseif len(result)
         return result
