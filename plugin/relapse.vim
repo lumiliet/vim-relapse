@@ -59,7 +59,7 @@ endf
 
 fun! s:ReadNamespace()
     for lineNumber in range(0, line('$'))
-        let match = matchlist(getline(lineNumber), '\_s*(ns\_s\_s*\(\_S\_S*\)')
+        let match = matchlist(getline(lineNumber), '\_s*(ns\_s\_s*\([^)]*\)')
         if len(match)
             return match[1]
         endif
