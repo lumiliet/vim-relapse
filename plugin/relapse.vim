@@ -4,6 +4,7 @@ command! -range Relapse <line1>,<line2>call s:ReadRange()
 
 
 fun! s:SendClojureCode(namespace, code, nreplPort)
+    echo a:namespace
     let json = json_encode({'namespace': a:namespace, 'code': a:code, 'port': a:nreplPort})
     let command = "echo " . shellescape(json) . " | nc localhost " . s:relapsePort . "\n"
     let result = system(command)
@@ -59,7 +60,7 @@ endf
 
 fun! s:ReadNamespace()
     for lineNumber in range(0, line('$'))
-        let match = matchlist(getline(lineNumber), '\_s*(ns\_s\_s*\([^)]*\)')
+        let match = matchlist(getline(lineNumber), '\_s*(ns\_s\_s*\([a-z.]*\)')
         if len(match)
             return match[1]
         endif
